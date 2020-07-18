@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drag and Drop Website</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://bootswatch.com/4/cosmo/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <style>
+        .drop-img-style,
+        .drop-text-style {
+            opacity: .4;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid d-flex align-items-center bg-light" style="height: 100vh;">
+        <div class="container p-4 text-center">
+            <h4 class="font-weight-bold mb-4">Upload Files</h4>
+            <div class="container bg-white shadow-sm w-75">
+                <div class="row h-100 p-0">
+                    <div class="col-12 bg-white drop-container d-flex flex-column justify-content-center align-items-center pt-4">
+                        <img src="./Group 8.png" class="drop-img">
+                        <h6 class="font-weight-bold mb-4 drop-text">Drop your files here.</h6>
+                    </div>
+                    <div class="col-12">
+                        <div class="row">
+                            <div class="col-12 p-0">
+                                <form class="upload-from" enctype="multipart/form-data" action="" method="post">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text border-0 px-4 text-light"
+                                                style="background-color:#30f250;"><i class="fa fa-plus"></i></span>
+                                        </div>
+                                        <input type="file" name="files[]" id="files" placeholder="Click here to Upload"
+                                            class="form-control border-0 bg-light shadow-sm" multiple>
+                                        <button class="btn px-4 text-light shadow-sm" type="submit" style="position: relative;top: 60px;left:-45%;background-color:#007AFF"><i class="fa fa-cloud-upload mr-2"></i>Upload</button>
+                                    </div>
+                                </form>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="upload-msg d-flex" style="margin-top: 80px;">
+            
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            $(".drop-container").on('dragover',function(){
+                $(".drop-img").addClass('drop-img-style');
+                $(".drop-text").addClass('drop-text-style');
+                return false;
+            });
+
+            $(".drop-container").on('dragleave',function(){
+                $(".drop-img").removeClass('drop-img-style');
+                $(".drop-text").removeClass('drop-text-style');
+                return false;
+            });
+
+            $(".drop-container").on("drop",function(e){
+                e.preventDefault();
+                $(".drop-img").removeClass('drop-img-style');
+                $(".drop-text").removeClass('drop-text-style');
+                var formData = new FormData();
+                var files_list = e.originalEvent.dataTransfer.files;
+                //console.log(file_list);
+                for(var i=0;i<files_list.length;i++){
+                    formData.append('file[]',files_list[i]);
+                }
+
+                $.ajax({
+                    method: "POST",
+                    url: './upload.php',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    cache: false,
+                    success: function(response){
+                        $(".upload-msg").html(response);
+                    }
+                })
+            });
+            
+            $(".upload-from").submit(function(e){
+                e.preventDefault();
+                var length = document.getElementById('files').files.length;
+                var files_list = document.getElementById('files');
+                //console.log(length);
+                var formData = new FormData();
+                for(var i=0;i<length;i++){
+                    formData.append('file[]',files_list.files[i]);
+                }
+
+                $.ajax({
+                    method: "POST",
+                    url: './upload.php',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    cache: false,
+                    success: function(response){
+                        $(".upload-msg").html(response);
+                    }
+                })
+            })          
+        })
+    </script>
+</body>
+</html>
